@@ -2,7 +2,7 @@
 
 A premium, full-stack e-commerce platform for cutting-edge electronics, and automatic updated Blog for news powered by AI , built with React, Vite, Tailwind CSS, and serverless Neon Postgres.
 
-![Nova.Tech Banner]([https://images.unsplash.com/photo-1518770660439-4636190af475](https://i.pinimg.com/1200x/74/3a/bd/743abdfde9b9953b8a784528ea4a27d1.jpg)?auto=format&fit=crop&w=1200&q=80)
+![Nova.Tech Banner](https://i.pinimg.com/1200x/9b/d2/ff/9bd2fffa88c86c8f519144fb786f5403.jpg?auto=format&fit=crop&w=1200&q=80)
 
 ## ✨ Features
 
