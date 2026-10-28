@@ -14,11 +14,15 @@ export interface Article {
 const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
 const BASE_URL = 'https://gnews.io/api/v4/top-headlines';
 const CACHE_TIME = 1000 * 60 * 60 * 4; 
-const CACHE_VERSION = 'v9'; 
+const CACHE_VERSION = 'v10'; // Bumped to clear old empty caches
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80';
 
 export const fetchTrendingArticles = async (category: string = 'technology', max: number = 12): Promise<Article[]> => {
-  if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY.trim() === '') return [];
+  // LOG IF KEY IS MISSING
+  if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY.trim() === '') {
+    console.error("❌ [NewsService] API Key is missing or undefined in this environment.");
+    return [];
+  }
 
   const cacheKey = `nova_news_${CACHE_VERSION}_${category}_${max}`;
   const cachedData = localStorage.getItem(cacheKey);
@@ -30,10 +34,19 @@ export const fetchTrendingArticles = async (category: string = 'technology', max
 
   try {
     const url = `${BASE_URL}?category=${category}&lang=en&max=${max}&apikey=${API_KEY}`;
+    console.log(`🌐 [NewsService] Fetching live data for: ${category}`);
+    
     const response = await fetch(url);
-    if (!response.ok) throw new Error('API Error');
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      // LOG THE EXACT API ERROR
+      console.error(`❌ [NewsService] API Error ${response.status}:`, errorData.message || errorData);
+      return [];
+    }
     
     const data = await response.json();
+    console.log(`✅ [NewsService] Successfully loaded ${data.articles?.length || 0} articles.`);
     
     const articles: Article[] = data.articles.map((article: any, index: number) => {
       let cleanExcerpt = article.description || '';
@@ -58,12 +71,12 @@ export const fetchTrendingArticles = async (category: string = 'technology', max
 
     localStorage.setItem(cacheKey, JSON.stringify({ data: articles, timestamp: Date.now() }));
     return articles;
-  } catch (error) {
+  } catch (error: any) {
+    console.error("❌ [NewsService] Network Fetch Error:", error.message);
     return [];
   }
 };
 
-// THIS WAS MISSING - NOW ADDED BACK
 export const prefetchNews = async () => {
   await fetchTrendingArticles('technology', 12);
 };
