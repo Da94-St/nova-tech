@@ -11,18 +11,11 @@ export interface Article {
   url: string;
 }
 
-const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
-const BASE_URL = 'https://gnews.io/api/v4/top-headlines';
 const CACHE_TIME = 1000 * 60 * 60 * 4; 
-const CACHE_VERSION = 'v11';
+const CACHE_VERSION = 'v12'; // Bumped to clear old caches
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80';
 
 export const fetchTrendingArticles = async (category: string = 'technology', max: number = 12): Promise<Article[]> => {
-  if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY.trim() === '') {
-    console.error("❌ [NewsService] API Key is missing or undefined in this environment.");
-    return [];
-  }
-
   const cacheKey = `nova_news_${CACHE_VERSION}_${category}_${max}`;
   const cachedData = localStorage.getItem(cacheKey);
 
@@ -32,14 +25,14 @@ export const fetchTrendingArticles = async (category: string = 'technology', max
   }
 
   try {
-    const url = `${BASE_URL}?category=${category}&lang=en&max=${max}&apikey=${API_KEY}`;
-    console.log(`🌐 [NewsService] Fetching live data for: ${category}`);
+    // CALL YOUR OWN SERVERLESS PROXY INSTEAD OF GNEWS
+    const url = `/api/news?category=${category}`;
+    console.log(`🌐 [NewsService] Fetching from proxy: ${url}`);
     
     const response = await fetch(url);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error(`❌ [NewsService] API Error ${response.status}:`, errorData.message || errorData);
+      console.error(`❌ [NewsService] Proxy Error ${response.status}`);
       return [];
     }
     
