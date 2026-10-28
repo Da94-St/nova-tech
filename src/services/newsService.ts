@@ -14,11 +14,10 @@ export interface Article {
 const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
 const BASE_URL = 'https://gnews.io/api/v4/top-headlines';
 const CACHE_TIME = 1000 * 60 * 60 * 4; 
-const CACHE_VERSION = 'v10'; // Bumped to clear old empty caches
+const CACHE_VERSION = 'v11';
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80';
 
 export const fetchTrendingArticles = async (category: string = 'technology', max: number = 12): Promise<Article[]> => {
-  // LOG IF KEY IS MISSING
   if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY.trim() === '') {
     console.error("❌ [NewsService] API Key is missing or undefined in this environment.");
     return [];
@@ -40,7 +39,6 @@ export const fetchTrendingArticles = async (category: string = 'technology', max
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      // LOG THE EXACT API ERROR
       console.error(`❌ [NewsService] API Error ${response.status}:`, errorData.message || errorData);
       return [];
     }
